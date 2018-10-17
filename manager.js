@@ -17,9 +17,9 @@ function performSelect (query)
         var rLength = results.length;
     
         console.log ("department".padEnd(25),
-                     "product:".padEnd (25),
-                     "price:".padEnd(10),
-                     "qty available: ");
+                     "product".padEnd (25),
+                     "price".padEnd(10),
+                     "qty available");
 
         for (var i=0; i<rLength; i++)
         {   console.log (results[i].product.padEnd (25),
