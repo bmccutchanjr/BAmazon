@@ -73,17 +73,35 @@ function adjustInventory ()
         
             var product = answer.product;
 
-            var query = "update products set quantity = quantity";
-            if (answer.quantity >= 0) query = query + " + ";
-            query = query + answer.quantity + " where product='" + answer.product + "';";
+            // It appears the '?' syntax will not let me set a value with something like
+            // 'quantity = quantity + 3' (which if you look into it is the MySQL recommended method because
+            // it only requires one uppate rather than a select and an update.)  When I try something like
+            // { quantity: "quantity + 3" } set quantity in the database to 0.  So I need to get the current
+            // value of quantity so I can calculate the new value.
 
-            connection.query (query, function (error, result)
-            {   if (error) throw error;
-        
-                console.log (chalk.green(product, " has been successfully updated"));
-                var query = "select * from products where product='" + product + "';";
-                console.log (query);
-                performSelect (query)
+            connection.query ("select quantity from products where product = '" + answer.product + "';",
+            {   product:    answer.product
+            },
+            function (err, response)
+            {   if (err) throw err;
+
+                var qty = parseInt(response[0].quantity) + parseInt(answer.quantity);
+                
+                connection.query ("update products set ? where ?",
+                [   {   quantity: qty
+                    },
+                    {   product: "pencils"
+                    }
+                ],
+                function (error, result)
+                {   if (error) throw error;
+            
+                    console.log (chalk.green(product, " has been successfully updated"));
+                    var query = "select * from products where product='" + product + "';";
+                    performSelect (query)
+            
+                    connection.end();
+                })
             })
         })
     })
@@ -146,15 +164,17 @@ function newProduct ()
 
         var product = answer.product;
 
-        connection.query ("insert into products (product, department, quantity, price) values('" +
-                          answer.product + "', '" + 
-                          answer.department + "', " +
-                          answer.quantity + ", " +
-                          answer.price + ");",
+        connection.query ("insert into products (product, department, quantity, price) values(?, ?, ?, ?);",
+        [   answer.product, 
+            answer.department,
+            answer.quantity,
+            answer.price
+        ],
         function (error, result)
         {   if (error) throw error;
 
             console.log (chalk.green("New Product ", product, " added."));
+            connection.end();
         }) 
     })
 }

@@ -1,6 +1,7 @@
 // Implements the "supervisor" functions for bAmazon.
 
 const chalk = require("chalk");
+const cTable = require("console.table");
 const inquirer = require("inquirer");
 const mysql = require("mysql");
 const connection = mysql.createConnection (
@@ -21,19 +22,9 @@ function profitStatement (query)
     connection.query (query, function (error, results)
     {   if (error) throw error;
 
-        var rLength = results.length;
-    
-        console.log ("department".padEnd(25),
-                     "overhead".padEnd (15),
-                     "total sales".padEnd(15),
-                     "total profit");
+        console.table (results);
 
-        for (var i=0; i<rLength; i++)
-        {   console.log (results[i].department.padEnd(25),
-                         results[i].overhead.toString().padEnd(15),
-                         results[i].total_sales ? results[i].total_sales.toString().padEnd(15) : "               ",
-                         results[i].total_profit ? results[i].total_profit.toString().padEnd(10) : " ");
-        }
+        connection.end();
     });
 }
 
@@ -70,15 +61,16 @@ function newDepartment ()
     {   // finally insert the new product into the database
 
         var department = answer.department;
-console.log ("department: ", answer.department);
-console.log ("overhead: ", answer.overhead);
-        connection.query ("insert into departments (department, overhead) values('" +
-                          answer.department + "', " +
-                          answer.overhead + ");",
+        connection.query ("insert into departments (department, overhead) values(?, ?);",
+        [   answer.department,
+            answer.overhead
+        ],
         function (error, result)
         {   if (error) throw error;
 
             console.log (chalk.green("New department ", department, " added."));
+
+            connection.end();
         }) 
     })
 }

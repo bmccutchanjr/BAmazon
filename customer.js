@@ -18,7 +18,7 @@ const connection = mysql.createConnection (
 });
 
 function placeOrder ()
-{   connection.query ("select * from products order by product;", function (error, results)
+{   connection.query ("select product, department, price, quantity from products order by product;", function (error, results)
     {   if (error) throw error;
 
         console.log ("\n==============================\nbAmazon!\nAvailable for purchase:\n------------------------------");
@@ -82,28 +82,20 @@ function placeOrder ()
                             {   product: what2Buy
                             }
                         ],  function (error, results)
-                        // connection.query ("update products set ? where product='" + what2Buy + "';",
-                        // {   quantity: (results[0].quantity - qty2Buy),
-                        //     sales: (results[0].sales + (qty2Buy * results[0].price))
-                        // },  function (error, results)
                         {   if (error) throw error;
                         
                             if (qty2Buy > 1) what2Buy += "s";
                             console.log (chalk.green("Your purchase has been completed."));
                             console.log ("You bought ", qty2Buy, " ", what2Buy, " for $", cost)
                             console.log ("Thank you for your business");
-
-                            // placeOrder();
                         })
                     }
+
+                    connection.end();
                 })
             })
         })
-    }
-    // .catch(function(error)
-    // {   console.log (chalk.red("Sorry, an error occured.\nUnable to complete this sale."));
-    //     throw error;
-    // })
-)};
+    })
+};
 
 placeOrder ();
