@@ -27,6 +27,8 @@ function performSelect (query)
                          results[i].price.toString().padEnd(10),
                          results[i].quantity);
         }
+
+        connection.end();
     });
 }
 
@@ -86,11 +88,11 @@ function adjustInventory ()
             {   if (err) throw err;
 
                 var qty = parseInt(response[0].quantity) + parseInt(answer.quantity);
-                
+
                 connection.query ("update products set ? where ?",
                 [   {   quantity: qty
                     },
-                    {   product: "pencils"
+                    {   product: product
                     }
                 ],
                 function (error, result)
@@ -99,8 +101,6 @@ function adjustInventory ()
                     console.log (chalk.green(product, " has been successfully updated"));
                     var query = "select * from products where product='" + product + "';";
                     performSelect (query)
-            
-                    connection.end();
                 })
             })
         })
