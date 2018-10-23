@@ -27,8 +27,8 @@ from departments d
 left join products p on d.department = p.department
 group by department;
 ```
-Produces [this output](![grab1](https://user-images.githubusercontent.com/37744208/47331283-81985180-d649-11e8-8e9f-d95f9b5ba19c.png)
-) on the console screen using `console.table`.
+Produces [this output](https://user-images.githubusercontent.com/37744208/47331283-81985180-d649-11e8-8e9f-d95f9b5ba19c.png)
+ on the console screen using `console.table`.
 
 The second allows the user to update the `departments` table.
 
